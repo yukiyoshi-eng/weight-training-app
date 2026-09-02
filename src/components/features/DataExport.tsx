@@ -2,6 +2,8 @@
 
 import React, { useRef, useState } from 'react';
 import { db } from '@/lib/db';
+import type { EquipmentType, Exercise } from '@/lib/db';
+import { DEFAULT_EXERCISES } from '@/lib/exerciseCatalog';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Download, Upload } from 'lucide-react';
@@ -21,7 +23,7 @@ export const DataExport = () => {
             const goals = await db.goals.toArray();
 
             const data = {
-                version: 1,
+                version: 2,
                 timestamp: new Date().toISOString(),
                 exercises,
                 sessions,
@@ -51,13 +53,22 @@ export const DataExport = () => {
         if (!file) return;
         try {
             const data = JSON.parse(await file.text());
-            if (data.version !== 1 || !Array.isArray(data.exercises) || !Array.isArray(data.sessions) || !Array.isArray(data.sets)) {
+            if (![1, 2].includes(data.version) || !Array.isArray(data.exercises) || !Array.isArray(data.sessions) || !Array.isArray(data.sets)) {
                 throw new Error('Invalid backup');
             }
             if (!confirm('現在のデータをバックアップ内容で置き換えますか？')) return;
+            const catalogByName = new Map(DEFAULT_EXERCISES.map((item) => [item.name, item]));
+            const backupExercises = data.exercises as Array<Omit<Exercise, 'equipment'> & { equipment?: EquipmentType }>;
+            const importedExercises: Exercise[] = backupExercises.map((item) => ({
+                ...item,
+                equipment: item.equipment ?? catalogByName.get(item.name)?.equipment ?? 'other',
+            }));
+            const importedNames = new Set(importedExercises.map((item) => item.name));
+            const missingDefaults = DEFAULT_EXERCISES.filter((item) => !importedNames.has(item.name));
             await db.transaction('rw', db.exercises, db.sessions, db.sets, db.goals, async () => {
                 await Promise.all([db.exercises.clear(), db.sessions.clear(), db.sets.clear(), db.goals.clear()]);
-                await db.exercises.bulkPut(data.exercises);
+                await db.exercises.bulkPut(importedExercises);
+                if (missingDefaults.length) await db.exercises.bulkAdd(missingDefaults);
                 await db.sessions.bulkPut(data.sessions);
                 await db.sets.bulkPut(data.sets);
                 if (Array.isArray(data.goals)) await db.goals.bulkPut(data.goals);

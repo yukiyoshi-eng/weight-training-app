@@ -2,6 +2,12 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { db, deleteSession } from '@/lib/db';
+import type { EquipmentType, MuscleTarget } from '@/lib/db';
+import {
+    EQUIPMENT_LABELS,
+    filterAndSortExercises,
+    MUSCLE_LABELS,
+} from '@/lib/exerciseCatalog';
 import { toLocalDateKey } from '@/lib/date';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -11,6 +17,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import styles from './SessionRecorder.module.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SetRecorder } from './SetRecorder';
+import { ExerciseFilterControls } from './ExerciseFilterControls';
 
 export const SessionRecorder = () => {
     const router = useRouter();
@@ -24,6 +31,9 @@ export const SessionRecorder = () => {
     const [originalEndTime, setOriginalEndTime] = useState<string | undefined>();
     const [isReady, setIsReady] = useState(false);
     const [search, setSearch] = useState('');
+    const [equipmentFilter, setEquipmentFilter] = useState<EquipmentType | 'all'>('all');
+    const [muscleFilter, setMuscleFilter] = useState<MuscleTarget | 'all'>('all');
+    const [favoritesOnly, setFavoritesOnly] = useState(false);
     const [error, setError] = useState('');
 
     const exercises = useLiveQuery(() => db.exercises.filter((exercise) => !exercise.isDeleted).toArray());
@@ -62,11 +72,18 @@ export const SessionRecorder = () => {
     }, [requestedSessionId]);
 
     const availableExercises = useMemo(() => {
-        const list = exercises ?? [];
-        return [...list]
-            .filter((exercise) => exercise.name.toLowerCase().includes(search.toLowerCase()))
-            .sort((a, b) => Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)) || a.name.localeCompare(b.name, 'ja'));
-    }, [exercises, search]);
+        return filterAndSortExercises(exercises ?? [], {
+            search,
+            equipment: equipmentFilter,
+            muscle: muscleFilter,
+            favoritesOnly,
+        });
+    }, [equipmentFilter, exercises, favoritesOnly, muscleFilter, search]);
+
+    const activeExerciseIds = useMemo(
+        () => new Set((activeExercises ?? []).map((exercise) => exercise.id)),
+        [activeExercises],
+    );
 
     const handleStartSession = async () => {
         const now = new Date().toISOString();
@@ -198,6 +215,15 @@ export const SessionRecorder = () => {
                             aria-label="追加する種目を検索"
                         />
                     </div>
+                    <ExerciseFilterControls
+                        equipment={equipmentFilter}
+                        muscle={muscleFilter}
+                        favoritesOnly={favoritesOnly}
+                        onEquipmentChange={setEquipmentFilter}
+                        onMuscleChange={setMuscleFilter}
+                        onFavoritesChange={setFavoritesOnly}
+                    />
+                    <p className={styles.resultCount}>{availableExercises.length}種目を表示</p>
                     <div className={styles.searchList}>
                         {availableExercises.map((exercise) => (
                             <button
@@ -206,10 +232,19 @@ export const SessionRecorder = () => {
                                 onClick={() => setActiveExerciseId(exercise.id!)}
                             >
                                 <Plus size={16} aria-hidden="true" />
-                                <span>{exercise.name}</span>
+                                <span className={styles.exerciseChoiceInfo}>
+                                    <span className={styles.exerciseChoiceName}>{exercise.name}</span>
+                                    <span className={styles.exerciseChoiceMeta}>
+                                        {EQUIPMENT_LABELS[exercise.equipment]} ・ {exercise.targetMuscles.map((muscle) => MUSCLE_LABELS[muscle]).join(' / ')}
+                                    </span>
+                                </span>
+                                {activeExerciseIds.has(exercise.id) && <span className={styles.activeBadge}>記録中</span>}
                                 {exercise.favorite && <span className={styles.favorite}>★</span>}
                             </button>
                         ))}
+                        {!availableExercises.length && (
+                            <p className={styles.noResults}>条件に合う種目がありません。絞り込みを変更してください。</p>
+                        )}
                     </div>
                 </div>
             </div>

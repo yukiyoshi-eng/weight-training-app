@@ -6,7 +6,7 @@ import { db } from '@/lib/db';
 import type { MuscleTarget } from '@/lib/db';
 import { Card } from '@/components/ui/Card';
 import { calculateSetLoad, filterSessionsByDays } from '@/lib/analytics';
-import { MUSCLE_LABELS } from './AddExerciseForm';
+import { MUSCLE_LABELS } from '@/lib/exerciseCatalog';
 import styles from './MuscleMap.module.css';
 
 export const MuscleMap = ({ days }: { days: number | null }) => {

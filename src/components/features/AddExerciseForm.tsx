@@ -2,29 +2,18 @@
 
 import React, { useState } from 'react';
 import { db } from '@/lib/db';
-import type { Exercise, ExerciseType, MuscleTarget } from '@/lib/db';
+import type { EquipmentType, Exercise, ExerciseType, MuscleTarget } from '@/lib/db';
+import {
+    EQUIPMENT_LABELS,
+    EQUIPMENT_TYPES,
+    EXERCISE_TYPE_LABELS,
+    MUSCLE_LABELS,
+    MUSCLE_TARGETS,
+} from '@/lib/exerciseCatalog';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import styles from './AddExerciseForm.module.css';
-
-const MUSCLE_TARGETS: MuscleTarget[] = ['chest', 'back', 'shoulders', 'arms', 'legs', 'core', 'other'];
-
-export const MUSCLE_LABELS: Record<MuscleTarget, string> = {
-    chest: '胸',
-    back: '背中',
-    shoulders: '肩',
-    arms: '腕',
-    legs: '脚',
-    core: '体幹',
-    other: 'その他',
-};
-
-const TYPE_LABELS: Record<ExerciseType, string> = {
-    weight_reps: '重量 × 回数',
-    bodyweight_reps: '自重 × 回数',
-    duration: '時間',
-};
 
 type AddExerciseFormProps = {
     exercise?: Exercise;
@@ -36,6 +25,7 @@ export const AddExerciseForm = ({ exercise, onCancel, onSuccess }: AddExerciseFo
     const [name, setName] = useState(exercise?.name ?? '');
     const [selectedMuscles, setSelectedMuscles] = useState<MuscleTarget[]>(exercise?.targetMuscles ?? []);
     const [type, setType] = useState<ExerciseType>(exercise?.type ?? 'weight_reps');
+    const [equipment, setEquipment] = useState<EquipmentType>(exercise?.equipment ?? 'dumbbell');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
 
@@ -53,6 +43,7 @@ export const AddExerciseForm = ({ exercise, onCancel, onSuccess }: AddExerciseFo
                 name: name.trim(),
                 targetMuscles: selectedMuscles,
                 type,
+                equipment,
                 custom: exercise?.custom ?? true,
             };
             if (exercise?.id) {
@@ -89,6 +80,20 @@ export const AddExerciseForm = ({ exercise, onCancel, onSuccess }: AddExerciseFo
                 />
 
                 <div className={styles.field}>
+                    <label className={styles.label} htmlFor="exercise-equipment">器具</label>
+                    <select
+                        id="exercise-equipment"
+                        className={styles.select}
+                        value={equipment}
+                        onChange={(event) => setEquipment(event.target.value as EquipmentType)}
+                    >
+                        {EQUIPMENT_TYPES.map((value) => (
+                            <option key={value} value={value}>{EQUIPMENT_LABELS[value]}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className={styles.field}>
                     <label className={styles.label} htmlFor="exercise-type">記録方法</label>
                     <select
                         id="exercise-type"
@@ -96,7 +101,7 @@ export const AddExerciseForm = ({ exercise, onCancel, onSuccess }: AddExerciseFo
                         value={type}
                         onChange={(event) => setType(event.target.value as ExerciseType)}
                     >
-                        {Object.entries(TYPE_LABELS).map(([value, label]) => (
+                        {Object.entries(EXERCISE_TYPE_LABELS).map(([value, label]) => (
                             <option key={value} value={value}>{label}</option>
                         ))}
                     </select>

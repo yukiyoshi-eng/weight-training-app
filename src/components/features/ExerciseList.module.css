@@ -39,6 +39,12 @@
     gap: var(--spacing-sm);
 }
 
+.resultCount {
+    margin: calc(var(--spacing-xs) * -1) 0 var(--spacing-md);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
 .item {
     display: flex;
     align-items: center;
@@ -102,6 +108,11 @@
     background: var(--surface-hover);
     padding: 2px 6px;
     border-radius: 4px;
+}
+
+.equipmentTag {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 13%, var(--surface-hover));
 }
 
 .empty {

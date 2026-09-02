@@ -3,8 +3,8 @@ import { calculateSetLoad, calculateStreak, filterSessionsByDays, summarizeTrain
 import type { Exercise, TrainingSession } from './db';
 
 const exercises = new Map<number, Exercise>([
-    [1, { id: 1, name: 'ベンチプレス', targetMuscles: ['chest'], type: 'weight_reps', custom: false }],
-    [2, { id: 2, name: '懸垂', targetMuscles: ['back'], type: 'bodyweight_reps', custom: false }],
+    [1, { id: 1, name: 'ベンチプレス', targetMuscles: ['chest'], type: 'weight_reps', equipment: 'barbell', custom: false }],
+    [2, { id: 2, name: '懸垂', targetMuscles: ['back'], type: 'bodyweight_reps', equipment: 'bodyweight', custom: false }],
 ]);
 
 describe('training analytics', () => {

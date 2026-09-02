@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import type { Exercise } from '@/lib/db';
+import type { EquipmentType, Exercise, MuscleTarget } from '@/lib/db';
+import { EQUIPMENT_LABELS, filterAndSortExercises, MUSCLE_LABELS } from '@/lib/exerciseCatalog';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { AddExerciseForm, MUSCLE_LABELS } from './AddExerciseForm';
+import { AddExerciseForm } from './AddExerciseForm';
+import { ExerciseFilterControls } from './ExerciseFilterControls';
 import { Pencil, Plus, Search, Star, Trash2 } from 'lucide-react';
 import styles from './ExerciseList.module.css';
 import { Input } from '@/components/ui/Input';
@@ -15,15 +17,11 @@ export const ExerciseList = () => {
     const [isAdding, setIsAdding] = useState(false);
     const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
     const [search, setSearch] = useState('');
+    const [equipmentFilter, setEquipmentFilter] = useState<EquipmentType | 'all'>('all');
+    const [muscleFilter, setMuscleFilter] = useState<MuscleTarget | 'all'>('all');
+    const [favoritesOnly, setFavoritesOnly] = useState(false);
 
-    const exercises = useLiveQuery(
-        () => db.exercises
-            .filter((exercise) =>
-                !exercise.isDeleted && exercise.name.toLowerCase().includes(search.toLowerCase()),
-            )
-            .toArray(),
-        [search],
-    );
+    const exercises = useLiveQuery(() => db.exercises.toArray());
 
     const handleDelete = async (exercise: Exercise) => {
         if (!exercise.id || !confirm(`「${exercise.name}」を種目一覧から削除しますか？\n過去の記録は保持されます。`)) return;
@@ -38,9 +36,12 @@ export const ExerciseList = () => {
 
     if (!exercises) return <div>読み込み中...</div>;
 
-    const sortedExercises = [...exercises].sort((a, b) =>
-        Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)) || a.name.localeCompare(b.name, 'ja'),
-    );
+    const sortedExercises = filterAndSortExercises(exercises, {
+        search,
+        equipment: equipmentFilter,
+        muscle: muscleFilter,
+        favoritesOnly,
+    });
 
     return (
         <div className={styles.container}>
@@ -77,6 +78,16 @@ export const ExerciseList = () => {
                 />
             </div>
 
+            <ExerciseFilterControls
+                equipment={equipmentFilter}
+                muscle={muscleFilter}
+                favoritesOnly={favoritesOnly}
+                onEquipmentChange={setEquipmentFilter}
+                onMuscleChange={setMuscleFilter}
+                onFavoritesChange={setFavoritesOnly}
+            />
+            <p className={styles.resultCount}>{sortedExercises.length}種目を表示</p>
+
             <div className={styles.list}>
                 {sortedExercises.map((exercise) => (
                     <Card key={exercise.id} className={styles.item}>
@@ -91,6 +102,9 @@ export const ExerciseList = () => {
                         <div className={styles.itemInfo}>
                             <h4 className={styles.itemName}>{exercise.name}</h4>
                             <div className={styles.tags}>
+                                <span className={`${styles.tag} ${styles.equipmentTag}`}>
+                                    {EQUIPMENT_LABELS[exercise.equipment]}
+                                </span>
                                 {exercise.targetMuscles.map((muscle) => (
                                     <span key={muscle} className={styles.tag}>{MUSCLE_LABELS[muscle]}</span>
                                 ))}
@@ -107,7 +121,7 @@ export const ExerciseList = () => {
                     </Card>
                 ))}
 
-                {exercises.length === 0 && <div className={styles.empty}>種目が見つかりません。</div>}
+                {sortedExercises.length === 0 && <div className={styles.empty}>条件に合う種目が見つかりません。</div>}
             </div>
         </div>
     );
