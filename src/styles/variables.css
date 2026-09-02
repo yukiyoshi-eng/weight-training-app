@@ -1,0 +1,45 @@
+:root {
+  /* Colors */
+  --background: #0a0a0a;
+  --surface: #1a1a1a;
+  --surface-hover: #2a2a2a;
+  --border: #333333;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+
+  --primary: #00f0ff; /* Cyan */
+  --primary-foreground: #000000;
+  
+  --secondary: #ccff00; /* Lime */
+  --secondary-foreground: #000000;
+
+  --accent: #ff0055; /* Pink/Red for errors or highlights */
+  
+  --success: #00cc66;
+  --warning: #ffcc00;
+  --error: #ff3333;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: var(--font-inter);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Already dark by default, but keeping structure if we add light mode later */
+  }
+}

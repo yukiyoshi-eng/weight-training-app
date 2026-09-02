@@ -1,0 +1,31 @@
+.container {
+    margin-top: var(--spacing-lg);
+    border: 1px solid var(--destructive);
+    background: rgba(255, 69, 58, 0.05);
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    color: var(--destructive);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.button {
+    width: 100%;
+}

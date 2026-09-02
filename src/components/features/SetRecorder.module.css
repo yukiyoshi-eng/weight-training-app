@@ -1,0 +1,75 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.setHeader {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 40px;
+    padding: 0 var(--spacing-sm);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.setRow {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 1fr 40px;
+    align-items: center;
+    background: var(--surface);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.setNumber {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.deleteBtn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.deleteBtn:hover {
+    color: var(--error);
+}
+
+.form {
+    margin-top: var(--spacing-md);
+}
+
+.inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.input {
+    text-align: center;
+}
+
+.addBtn {
+    width: 100%;
+}

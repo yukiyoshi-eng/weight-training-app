@@ -1,0 +1,71 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding-bottom: 80px;
+}
+
+.empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: var(--spacing-xl);
+}
+
+.sessionGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.sessionHeader {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    padding: 0 var(--spacing-xs);
+}
+
+.exerciseCard {
+    padding: var(--spacing-md);
+}
+
+.exerciseName {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary);
+}
+
+.setsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.setRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+}
+
+.setIndex {
+    color: var(--text-secondary);
+    width: 20px;
+}
+
+.setValue {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.setX {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.rpe {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-left: auto;
+}

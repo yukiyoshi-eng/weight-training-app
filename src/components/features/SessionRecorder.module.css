@@ -1,0 +1,72 @@
+.container {
+    padding-bottom: 80px;
+}
+
+.startContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.sessionInfo {
+    margin-bottom: var(--spacing-lg);
+}
+
+.exerciseList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.exerciseItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.exerciseItem:active {
+    background-color: var(--surface-hover);
+}
+
+.addExercise {
+    margin-top: var(--spacing-lg);
+}
+
+.addExercise h4 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+}
+
+.searchList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.searchItem {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    text-align: left;
+    font-size: 1rem;
+}
+
+.searchItem:hover {
+    background: var(--surface-hover);
+}

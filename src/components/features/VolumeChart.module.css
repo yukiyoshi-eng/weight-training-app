@@ -1,0 +1,26 @@
+.container {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.chartWrapper {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+}
+
+.empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-style: italic;
+}

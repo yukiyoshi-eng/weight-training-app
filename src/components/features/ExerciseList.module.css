@@ -1,0 +1,81 @@
+.container {
+    padding-bottom: 80px;
+    /* Space for bottom nav */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.searchBar {
+    position: relative;
+    margin-bottom: var(--spacing-md);
+}
+
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    z-index: 1;
+}
+
+.searchInput {
+    padding-left: 40px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    transition: transform 0.1s ease;
+}
+
+.item:active {
+    transform: scale(0.98);
+}
+
+.itemInfo {
+    flex: 1;
+}
+
+.itemName {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: var(--surface-hover);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: var(--spacing-xl);
+}

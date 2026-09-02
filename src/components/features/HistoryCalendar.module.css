@@ -1,0 +1,78 @@
+.container {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.monthTitle {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.weekday {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    position: relative;
+}
+
+.day:hover {
+    background: var(--surface-hover);
+}
+
+.day.selected {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+.day.hasTraining {
+    font-weight: 700;
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    background: var(--secondary);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 4px;
+}
+
+.day.selected .dot {
+    background: var(--primary-foreground);
+}
