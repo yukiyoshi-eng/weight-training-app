@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Exercise } from './db';
 import { DEFAULT_EXERCISES, filterAndSortExercises } from './exerciseCatalog';
+import { DETAILED_MUSCLE_LABELS, hasStandardMuscleProfile } from './muscleDetails';
 
 const catalog = DEFAULT_EXERCISES.map((item, index) => ({ ...item, id: index + 1 })) as Exercise[];
 
@@ -11,6 +12,19 @@ describe('exercise catalog', () => {
         expect(new Set(catalog.map((item) => item.equipment))).toEqual(
             new Set(['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight', 'kettlebell', 'other']),
         );
+    });
+
+    it('provides a normalized detailed muscle profile for every standard exercise', () => {
+        catalog.forEach((exercise) => {
+            expect(hasStandardMuscleProfile(exercise.name), exercise.name).toBe(true);
+            expect(exercise.muscleContributions?.length, exercise.name).toBeGreaterThan(0);
+            expect(exercise.muscleContributions?.reduce((sum, item) => sum + item.share, 0), exercise.name)
+                .toBeCloseTo(1);
+            exercise.muscleContributions?.forEach(({ muscle, share }) => {
+                expect(DETAILED_MUSCLE_LABELS[muscle], exercise.name).toBeTruthy();
+                expect(share, exercise.name).toBeGreaterThan(0);
+            });
+        });
     });
 
     it('combines equipment and muscle filters', () => {

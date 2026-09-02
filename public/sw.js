@@ -1,4 +1,4 @@
-const CACHE_NAME = 'liftlog-v3';
+const CACHE_NAME = 'liftlog-v4';
 const PAGE_PATHS = ['', 'record/', 'history/', 'analysis/', 'exercises/', 'settings/'];
 
 const scopedUrl = (path) => new URL(path, self.registration.scope).toString();

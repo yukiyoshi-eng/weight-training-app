@@ -10,6 +10,7 @@ import {
     MUSCLE_LABELS,
     MUSCLE_TARGETS,
 } from '@/lib/exerciseCatalog';
+import { getMuscleContributions } from '@/lib/muscleDetails';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
@@ -44,6 +45,7 @@ export const AddExerciseForm = ({ exercise, onCancel, onSuccess }: AddExerciseFo
                 targetMuscles: selectedMuscles,
                 type,
                 equipment,
+                muscleContributions: getMuscleContributions(name.trim(), selectedMuscles),
                 custom: exercise?.custom ?? true,
             };
             if (exercise?.id) {
@@ -122,6 +124,7 @@ export const AddExerciseForm = ({ exercise, onCancel, onSuccess }: AddExerciseFo
                             </button>
                         ))}
                     </div>
+                    <p className={styles.fieldNote}>カスタム種目の詳細な筋肉配分は、選んだ部位から自動で推定します。</p>
                 </fieldset>
 
                 {error && <p className={styles.error} role="alert">{error}</p>}

@@ -6,7 +6,6 @@ import type { EquipmentType, MuscleTarget } from '@/lib/db';
 import {
     EQUIPMENT_LABELS,
     filterAndSortExercises,
-    MUSCLE_LABELS,
 } from '@/lib/exerciseCatalog';
 import { toLocalDateKey } from '@/lib/date';
 import { Button } from '@/components/ui/Button';
@@ -18,6 +17,7 @@ import styles from './SessionRecorder.module.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SetRecorder } from './SetRecorder';
 import { ExerciseFilterControls } from './ExerciseFilterControls';
+import { DETAILED_MUSCLE_LABELS, getSortedMuscleContributions } from '@/lib/muscleDetails';
 
 export const SessionRecorder = () => {
     const router = useRouter();
@@ -235,7 +235,13 @@ export const SessionRecorder = () => {
                                 <span className={styles.exerciseChoiceInfo}>
                                     <span className={styles.exerciseChoiceName}>{exercise.name}</span>
                                     <span className={styles.exerciseChoiceMeta}>
-                                        {EQUIPMENT_LABELS[exercise.equipment]} ・ {exercise.targetMuscles.map((muscle) => MUSCLE_LABELS[muscle]).join(' / ')}
+                                        {EQUIPMENT_LABELS[exercise.equipment]} ・ {getSortedMuscleContributions(
+                                            exercise.name,
+                                            exercise.targetMuscles,
+                                            exercise.muscleContributions,
+                                        ).slice(0, 3).map(({ muscle, share }) => (
+                                            `${DETAILED_MUSCLE_LABELS[muscle]} ${Math.round(share * 100)}%`
+                                        )).join(' / ')}
                                     </span>
                                 </span>
                                 {activeExerciseIds.has(exercise.id) && <span className={styles.activeBadge}>記録中</span>}

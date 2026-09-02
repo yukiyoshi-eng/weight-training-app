@@ -75,6 +75,13 @@
     border-color: var(--primary);
 }
 
+.fieldNote {
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
 .actions {
     display: flex;
     justify-content: flex-end;

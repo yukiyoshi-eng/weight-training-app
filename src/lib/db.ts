@@ -1,9 +1,22 @@
 import Dexie, { Table } from 'dexie';
 import { DEFAULT_EXERCISES } from './exerciseCatalog';
+import { getMuscleContributions } from './muscleDetails';
 
 export type MuscleTarget = 'chest' | 'back' | 'shoulders' | 'arms' | 'legs' | 'core' | 'other';
 export type ExerciseType = 'weight_reps' | 'bodyweight_reps' | 'duration';
 export type EquipmentType = 'barbell' | 'dumbbell' | 'machine' | 'cable' | 'bodyweight' | 'kettlebell' | 'other';
+export type DetailedMuscle =
+    | 'upper_chest' | 'middle_chest' | 'lower_chest'
+    | 'lats' | 'traps' | 'rhomboids' | 'spinal_erectors'
+    | 'front_delts' | 'side_delts' | 'rear_delts'
+    | 'biceps' | 'triceps' | 'forearms'
+    | 'quads' | 'hamstrings' | 'glutes' | 'calves'
+    | 'abs' | 'obliques' | 'hip_flexors';
+
+export type MuscleContribution = {
+    muscle: DetailedMuscle;
+    share: number;
+};
 
 export interface Exercise {
     id?: number;
@@ -11,6 +24,7 @@ export interface Exercise {
     targetMuscles: MuscleTarget[];
     type: ExerciseType;
     equipment: EquipmentType;
+    muscleContributions?: MuscleContribution[];
     custom: boolean; // true if added by user
     isDeleted?: boolean; // Soft delete
     favorite?: boolean;
@@ -86,6 +100,23 @@ export class WeightTrainingDatabase extends Dexie {
             const existingNames = new Set(existing.map((item) => item.name));
             const missing = DEFAULT_EXERCISES.filter((item) => !existingNames.has(item.name));
             if (missing.length) await exercises.bulkAdd(missing);
+        });
+
+        this.version(4).stores({
+            exercises: '++id, name, *targetMuscles, type, equipment, custom, isDeleted, favorite',
+            sessions: '++id, date, endTime, updatedAt',
+            sets: '++id, sessionId, exerciseId, [sessionId+exerciseId]',
+            goals: '++id, exerciseId, deadline'
+        }).upgrade(async (transaction) => {
+            const exercises = transaction.table<Exercise>('exercises');
+            const existing = await exercises.toArray();
+            await Promise.all(existing.map((item) => exercises.update(item.id!, {
+                muscleContributions: getMuscleContributions(
+                    item.name,
+                    item.targetMuscles,
+                    item.muscleContributions,
+                ),
+            })));
         });
     }
 }

@@ -25,7 +25,7 @@ export default function SettingsPage() {
             <ResetDatabase />
 
             <div style={{ textAlign: 'center', marginTop: '2rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                LiftLog v1.2.0 · データはこの端末に保存されます
+                LiftLog v1.3.0 · データはこの端末に保存されます
             </div>
         </main>
     );

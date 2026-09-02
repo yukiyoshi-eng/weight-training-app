@@ -2,12 +2,6 @@
     margin-top: var(--spacing-md);
 }
 
-.title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0;
-}
-
 .header {
     display: flex;
     align-items: center;
@@ -16,8 +10,27 @@
     margin-bottom: var(--spacing-md);
 }
 
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.titleRow p {
+    margin: 2px 0 0;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+}
+
 .viewSwitch {
     display: flex;
+    flex: 0 0 auto;
     gap: 3px;
 }
 
@@ -37,51 +50,114 @@
     color: var(--primary);
 }
 
-.mapWrapper {
+.content {
+    display: grid;
+    grid-template-columns: minmax(170px, 0.75fr) minmax(250px, 1.25fr);
+    gap: var(--spacing-lg);
+    align-items: start;
+}
+
+.bodyPanel {
     display: flex;
-    gap: var(--spacing-md);
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--surface-hover) 45%, transparent);
 }
 
 .svg {
-    height: 300px;
-    width: 150px;
-    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+    width: 175px;
+    height: 330px;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.45));
 }
 
-.legend {
+.svg path {
+    transition: fill 0.2s ease;
+}
+
+.viewLabel {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+}
+
+.ranking {
+    max-height: 380px;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
-    min-width: 120px;
+    gap: 10px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
-.legendItem {
+.muscleRow {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.muscleLabel {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--spacing-sm);
-    font-size: 0.875rem;
+    font-size: 0.78rem;
 }
 
-.legendColor {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-}
-
-.legendLabel {
+.muscleLabel span {
     color: var(--text-secondary);
-    text-transform: capitalize;
-    flex: 1;
 }
 
-.legendValue {
-    font-weight: 600;
+.muscleLabel strong {
     color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.barTrack {
+    height: 7px;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--surface-hover);
+}
+
+.bar {
+    height: 100%;
+    display: block;
+    min-width: 2px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
 }
 
 .empty {
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--text-secondary);
     font-size: 0.85rem;
+}
+
+@media (max-width: 620px) {
+    .header {
+        align-items: flex-start;
+    }
+
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .bodyPanel {
+        padding: var(--spacing-xs);
+    }
+
+    .svg {
+        width: 160px;
+        height: 300px;
+    }
+
+    .ranking {
+        max-height: none;
+        overflow: visible;
+    }
 }

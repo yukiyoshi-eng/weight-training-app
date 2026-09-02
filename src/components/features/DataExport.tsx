@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react';
 import { db } from '@/lib/db';
 import type { EquipmentType, Exercise } from '@/lib/db';
 import { DEFAULT_EXERCISES } from '@/lib/exerciseCatalog';
+import { getMuscleContributions } from '@/lib/muscleDetails';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { TermHelp } from '@/components/ui/TermHelp';
@@ -25,7 +26,7 @@ export const DataExport = () => {
             const goals = await db.goals.toArray();
 
             const data = {
-                version: 2,
+                version: 3,
                 timestamp: new Date().toISOString(),
                 exercises,
                 sessions,
@@ -55,7 +56,7 @@ export const DataExport = () => {
         if (!file) return;
         try {
             const data = JSON.parse(await file.text());
-            if (![1, 2].includes(data.version) || !Array.isArray(data.exercises) || !Array.isArray(data.sessions) || !Array.isArray(data.sets)) {
+            if (![1, 2, 3].includes(data.version) || !Array.isArray(data.exercises) || !Array.isArray(data.sessions) || !Array.isArray(data.sets)) {
                 throw new Error('Invalid backup');
             }
             if (!confirm('現在のデータをバックアップ内容で置き換えますか？')) return;
@@ -64,6 +65,11 @@ export const DataExport = () => {
             const importedExercises: Exercise[] = backupExercises.map((item) => ({
                 ...item,
                 equipment: item.equipment ?? catalogByName.get(item.name)?.equipment ?? 'other',
+                muscleContributions: getMuscleContributions(
+                    item.name,
+                    item.targetMuscles,
+                    item.muscleContributions,
+                ),
             }));
             const importedNames = new Set(importedExercises.map((item) => item.name));
             const missingDefaults = DEFAULT_EXERCISES.filter((item) => !importedNames.has(item.name));

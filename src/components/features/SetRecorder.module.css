@@ -19,6 +19,71 @@
     width: 72px;
 }
 
+.muscleProfile {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+}
+
+.profileHeader {
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.profileList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px var(--spacing-md);
+}
+
+.profileItem {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profileItem > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xs);
+    font-size: 0.72rem;
+}
+
+.profileItem > div span {
+    overflow: hidden;
+    color: var(--text-secondary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profileItem strong {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.profileTrack {
+    height: 5px;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--surface-hover);
+}
+
+.profileTrack > span {
+    height: 100%;
+    display: block;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
 .previousRecord {
     display: flex;
     align-items: center;
@@ -144,5 +209,9 @@
     .rowActions {
         grid-column: 2 / -1;
         justify-content: flex-end;
+    }
+
+    .profileList {
+        grid-template-columns: 1fr;
     }
 }

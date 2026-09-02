@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { calculateSetLoad, calculateStreak, filterSessionsByDays, summarizeTraining } from './analytics';
+import {
+    calculateDetailedMuscleLoads,
+    calculateSetLoad,
+    calculateStreak,
+    filterSessionsByDays,
+    summarizeTraining,
+} from './analytics';
 import type { Exercise, TrainingSession } from './db';
 
 const exercises = new Map<number, Exercise>([
@@ -11,6 +17,17 @@ describe('training analytics', () => {
     it('calculates load according to exercise type', () => {
         expect(calculateSetLoad({ sessionId: 1, exerciseId: 1, weight: 60, reps: 10, order: 1 }, exercises.get(1))).toBe(600);
         expect(calculateSetLoad({ sessionId: 1, exerciseId: 2, reps: 8, order: 1 }, exercises.get(2))).toBe(8);
+    });
+
+    it('distributes a set load across the detailed muscle profile', () => {
+        const loads = calculateDetailedMuscleLoads([
+            { sessionId: 1, exerciseId: 1, weight: 60, reps: 10, order: 1 },
+        ], exercises);
+
+        expect(loads.middle_chest).toBeCloseTo(330);
+        expect(loads.triceps).toBeCloseTo(150);
+        expect(loads.front_delts).toBeCloseTo(120);
+        expect(Object.values(loads).reduce((sum, value) => sum + value, 0)).toBeCloseTo(600);
     });
 
     it('filters sessions with local date keys', () => {

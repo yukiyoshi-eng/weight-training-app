@@ -1,4 +1,5 @@
 import type { EquipmentType, Exercise, ExerciseType, MuscleTarget } from './db';
+import { getMuscleContributions } from './muscleDetails';
 
 export const MUSCLE_TARGETS: MuscleTarget[] = ['chest', 'back', 'shoulders', 'arms', 'legs', 'core', 'other'];
 
@@ -38,14 +39,21 @@ export const EXERCISE_TYPE_LABELS: Record<ExerciseType, string> = {
     duration: '時間',
 };
 
-type CatalogExercise = Pick<Exercise, 'name' | 'targetMuscles' | 'type' | 'equipment' | 'custom'>;
+type CatalogExercise = Pick<Exercise, 'name' | 'targetMuscles' | 'type' | 'equipment' | 'muscleContributions' | 'custom'>;
 
 const exercise = (
     name: string,
     targetMuscles: MuscleTarget[],
     equipment: EquipmentType,
     type: ExerciseType = 'weight_reps',
-): CatalogExercise => ({ name, targetMuscles, equipment, type, custom: false });
+): CatalogExercise => ({
+    name,
+    targetMuscles,
+    equipment,
+    type,
+    muscleContributions: getMuscleContributions(name, targetMuscles),
+    custom: false,
+});
 
 export const DEFAULT_EXERCISES: CatalogExercise[] = [
     exercise('ベンチプレス', ['chest', 'arms'], 'barbell'),

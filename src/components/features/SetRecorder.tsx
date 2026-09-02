@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { TermHelp } from '@/components/ui/TermHelp';
 import { TERM_DEFINITIONS } from '@/lib/terms';
+import { DETAILED_MUSCLE_LABELS, getSortedMuscleContributions } from '@/lib/muscleDetails';
 import { Copy, Pencil, Trash2 } from 'lucide-react';
 import styles from './SetRecorder.module.css';
 import { formatDateKey } from '@/lib/date';
@@ -125,6 +126,12 @@ export const SetRecorder = ({ sessionId, exerciseId, onBack }: SetRecorderProps)
 
     if (!exercise) return <div className={styles.loading}>種目を読み込んでいます...</div>;
 
+    const muscleProfile = getSortedMuscleContributions(
+        exercise.name,
+        exercise.targetMuscles,
+        exercise.muscleContributions,
+    );
+
     const formatSet = (set: TrainingSet) => {
         if (exercise.type === 'duration') return `${set.durationSeconds ?? 0}秒`;
         if (exercise.type === 'bodyweight_reps') return `${set.reps ?? 0}回`;
@@ -138,6 +145,26 @@ export const SetRecorder = ({ sessionId, exerciseId, onBack }: SetRecorderProps)
                 <h3>{exercise.name}</h3>
                 <div className={styles.headerSpacer} />
             </div>
+
+            <section className={styles.muscleProfile} aria-label={`${exercise.name}の推定刺激配分`}>
+                <div className={styles.profileHeader}>
+                    <span>この種目の推定刺激配分</span>
+                    <TermHelp definition={TERM_DEFINITIONS.estimatedStimulus} />
+                </div>
+                <div className={styles.profileList}>
+                    {muscleProfile.map(({ muscle, share }) => (
+                        <div key={muscle} className={styles.profileItem}>
+                            <div>
+                                <span>{DETAILED_MUSCLE_LABELS[muscle]}</span>
+                                <strong>{Math.round(share * 100)}%</strong>
+                            </div>
+                            <span className={styles.profileTrack}>
+                                <span style={{ width: `${share * 100}%` }} />
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </section>
 
             {previousRecord && (
                 <section className={styles.previousRecord}>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import type { EquipmentType, Exercise, MuscleTarget } from '@/lib/db';
-import { EQUIPMENT_LABELS, filterAndSortExercises, MUSCLE_LABELS } from '@/lib/exerciseCatalog';
+import { EQUIPMENT_LABELS, filterAndSortExercises } from '@/lib/exerciseCatalog';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { AddExerciseForm } from './AddExerciseForm';
@@ -12,6 +12,7 @@ import { ExerciseFilterControls } from './ExerciseFilterControls';
 import { Pencil, Plus, Search, Star, Trash2 } from 'lucide-react';
 import styles from './ExerciseList.module.css';
 import { Input } from '@/components/ui/Input';
+import { DETAILED_MUSCLE_LABELS, getSortedMuscleContributions } from '@/lib/muscleDetails';
 
 export const ExerciseList = () => {
     const [isAdding, setIsAdding] = useState(false);
@@ -105,8 +106,14 @@ export const ExerciseList = () => {
                                 <span className={`${styles.tag} ${styles.equipmentTag}`}>
                                     {EQUIPMENT_LABELS[exercise.equipment]}
                                 </span>
-                                {exercise.targetMuscles.map((muscle) => (
-                                    <span key={muscle} className={styles.tag}>{MUSCLE_LABELS[muscle]}</span>
+                                {getSortedMuscleContributions(
+                                    exercise.name,
+                                    exercise.targetMuscles,
+                                    exercise.muscleContributions,
+                                ).slice(0, 3).map(({ muscle, share }) => (
+                                    <span key={muscle} className={styles.tag}>
+                                        {DETAILED_MUSCLE_LABELS[muscle]} {Math.round(share * 100)}%
+                                    </span>
                                 ))}
                             </div>
                         </div>
