@@ -6,6 +6,8 @@ import { db } from '@/lib/db';
 import type { TrainingSet } from '@/lib/db';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { TermHelp } from '@/components/ui/TermHelp';
+import { TERM_DEFINITIONS } from '@/lib/terms';
 import { Copy, Pencil, Trash2 } from 'lucide-react';
 import styles from './SetRecorder.module.css';
 import { formatDateKey } from '@/lib/date';
@@ -214,6 +216,7 @@ export const SetRecorder = ({ sessionId, exerciseId, onBack }: SetRecorderProps)
                         max="10"
                         step="0.5"
                         label="RPE"
+                        help={<TermHelp definition={TERM_DEFINITIONS.rpe} align="end" />}
                         value={rpe}
                         onChange={(event) => setRpe(event.target.value)}
                         inputMode="decimal"

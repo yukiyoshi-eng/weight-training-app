@@ -7,6 +7,8 @@ import type { Exercise, TrainingSet } from '@/lib/db';
 import { Card } from '@/components/ui/Card';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { TermHelp } from '@/components/ui/TermHelp';
+import { TERM_DEFINITIONS } from '@/lib/terms';
 import styles from './SessionList.module.css';
 
 interface SessionListProps {
@@ -56,6 +58,10 @@ export const SessionList = ({ date }: SessionListProps) => {
 
     return (
         <div className={styles.container}>
+            <div className={styles.termHint}>
+                <span>RPE</span>
+                <TermHelp definition={TERM_DEFINITIONS.rpe} />
+            </div>
             {sessionDetails?.map(({ session, exercises }) => (
                 <div key={session.id} className={styles.sessionGroup}>
                     <div className={styles.sessionHeader}>
@@ -105,7 +111,7 @@ export const SessionList = ({ date }: SessionListProps) => {
                             </div>
                         </Card>
                     ))}
-                    {!session.endTime && <p className={styles.draft}>入力途中のセッション</p>}
+                    {!session.endTime && <p className={styles.draft}>入力途中のトレーニング</p>}
                 </div>
             ))}
         </div>

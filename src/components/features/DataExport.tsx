@@ -6,6 +6,8 @@ import type { EquipmentType, Exercise } from '@/lib/db';
 import { DEFAULT_EXERCISES } from '@/lib/exerciseCatalog';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { TermHelp } from '@/components/ui/TermHelp';
+import { TERM_DEFINITIONS } from '@/lib/terms';
 import { Download, Upload } from 'lucide-react';
 import styles from './DataExport.module.css';
 
@@ -42,7 +44,7 @@ export const DataExport = () => {
             URL.revokeObjectURL(url);
         } catch (error) {
             console.error('Export failed:', error);
-            alert('Export failed');
+            alert('バックアップを書き出せませんでした。');
         } finally {
             setIsExporting(false);
         }
@@ -83,11 +85,15 @@ export const DataExport = () => {
 
     return (
         <Card className={styles.container}>
-            <h3 className={styles.title}>データ管理</h3>
+            <div className={styles.titleRow}>
+                <h3 className={styles.title}>データ管理</h3>
+                <span className={styles.format}>JSON</span>
+                <TermHelp definition={TERM_DEFINITIONS.json} />
+            </div>
             <div className={styles.actions}>
                 <Button onClick={handleExport} isLoading={isExporting} variant="secondary" className={styles.button}>
                     <Download size={16} style={{ marginRight: 8 }} />
-                    データのエクスポート (JSON)
+                    バックアップを書き出す
                 </Button>
                 <input
                     ref={fileInputRef}

@@ -11,6 +11,13 @@
     font-weight: 500;
 }
 
+.labelRow {
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
 .input {
     height: 40px;
     padding: 0 var(--spacing-md);

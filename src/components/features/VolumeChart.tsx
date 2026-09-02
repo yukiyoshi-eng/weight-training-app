@@ -7,6 +7,8 @@ import { Card } from '@/components/ui/Card';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { calculateSetLoad, filterSessionsByDays } from '@/lib/analytics';
 import { formatDateKey } from '@/lib/date';
+import { TermHelp } from '@/components/ui/TermHelp';
+import { TERM_DEFINITIONS } from '@/lib/terms';
 import styles from './VolumeChart.module.css';
 
 type Metric = 'volume' | 'maxWeight';
@@ -37,7 +39,10 @@ export const VolumeChart = ({ days }: { days: number | null }) => {
     return (
         <Card className={styles.container}>
             <div className={styles.header}>
-                <h3 className={styles.title}>{metric === 'volume' ? '総負荷の推移' : '最高重量の推移'}</h3>
+                <div className={styles.titleRow}>
+                    <h3 className={styles.title}>{metric === 'volume' ? '総負荷の推移' : '最高重量の推移'}</h3>
+                    {metric === 'volume' && <TermHelp definition={TERM_DEFINITIONS.totalLoad} />}
+                </div>
                 <div className={styles.metricSwitch}>
                     <button className={metric === 'volume' ? styles.active : ''} onClick={() => setMetric('volume')} aria-pressed={metric === 'volume'}>負荷</button>
                     <button className={metric === 'maxWeight' ? styles.active : ''} onClick={() => setMetric('maxWeight')} aria-pressed={metric === 'maxWeight'}>重量</button>

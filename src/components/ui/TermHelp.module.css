@@ -1,0 +1,73 @@
+.help {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+}
+
+.help summary {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    list-style: none;
+}
+
+.help summary::-webkit-details-marker {
+    display: none;
+}
+
+.help summary:hover,
+.help[open] summary {
+    background: var(--surface-hover);
+    color: var(--primary);
+}
+
+.help summary:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+}
+
+.popover {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 6px);
+    left: 0;
+    width: min(270px, calc(100vw - 40px));
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #171717;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.42);
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    text-align: left;
+}
+
+.alignEnd .popover {
+    right: 0;
+    left: auto;
+}
+
+.popover strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--primary);
+    font-size: 0.84rem;
+}
+
+.popover p {
+    margin: 0;
+}
+
+.popover small {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+}

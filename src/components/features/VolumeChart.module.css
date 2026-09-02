@@ -18,6 +18,12 @@
     margin-bottom: 0;
 }
 
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
 .metricSwitch {
     display: flex;
     gap: 3px;

@@ -5,6 +5,16 @@
     padding-bottom: 80px;
 }
 
+.termHint {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    align-self: flex-end;
+    gap: 2px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
 .empty {
     text-align: center;
     color: var(--text-secondary);

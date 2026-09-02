@@ -48,13 +48,13 @@ export default function Home() {
           </div>
           <div className={styles.statInfo}>
             <span className={styles.statValue}>{weeklyCount || 0}</span>
-            <span className={styles.statLabel}>今週のワークアウト</span>
+            <span className={styles.statLabel}>今週のトレーニング</span>
           </div>
         </Card>
       </section>
 
       <section className={styles.recentSection}>
-        <h3 className={styles.sectionTitle}>最近のアクティビティ</h3>
+        <h3 className={styles.sectionTitle}>最近の記録</h3>
         <div className={styles.recentList}>
           {recentSessions?.map(session => (
             <Card key={session.id} className={styles.recentItem}>

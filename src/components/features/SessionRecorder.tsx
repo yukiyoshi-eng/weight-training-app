@@ -117,7 +117,7 @@ export const SessionRecorder = () => {
     };
 
     const handleDeleteSession = async () => {
-        if (!sessionId || !confirm(wasCompleted ? 'このトレーニング記録を削除しますか？' : '入力中のセッションを破棄しますか？')) return;
+        if (!sessionId || !confirm(wasCompleted ? 'このトレーニング記録を削除しますか？' : '入力中のトレーニングを破棄しますか？')) return;
         await deleteSession(sessionId);
         setSessionId(null);
         setActiveExerciseId(null);
@@ -163,7 +163,7 @@ export const SessionRecorder = () => {
             <div className={styles.header}>
                 <div>
                     <span className={styles.eyebrow}>{wasCompleted ? 'EDIT WORKOUT' : 'ACTIVE WORKOUT'}</span>
-                    <h2>{wasCompleted ? '記録を編集' : '現在のセッション'}</h2>
+                    <h2>{wasCompleted ? '記録を編集' : '現在のトレーニング'}</h2>
                 </div>
                 <Button size="sm" onClick={handleFinishSession}>{wasCompleted ? '保存' : '終了'}</Button>
             </div>
@@ -179,7 +179,7 @@ export const SessionRecorder = () => {
                     }}
                 />
                 <Input
-                    label="セッションメモ"
+                    label="トレーニングメモ"
                     placeholder="調子やフォームのメモ"
                     value={memo}
                     onChange={(event) => setMemo(event.target.value)}
@@ -251,7 +251,7 @@ export const SessionRecorder = () => {
 
             <Button variant="ghost" className={styles.deleteSession} onClick={handleDeleteSession}>
                 <Trash2 size={16} aria-hidden="true" />
-                {wasCompleted ? 'この記録を削除' : 'セッションを破棄'}
+                {wasCompleted ? 'この記録を削除' : 'トレーニングを破棄'}
             </Button>
         </div>
     );

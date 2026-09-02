@@ -1,0 +1,51 @@
+.container {
+    margin-bottom: var(--spacing-lg);
+}
+
+.container h3 {
+    margin-bottom: var(--spacing-sm);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+}
+
+.item {
+    border-top: 1px solid var(--border);
+}
+
+.item summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.item summary::after {
+    content: '＋';
+    margin-left: auto;
+    color: var(--text-secondary);
+}
+
+.item[open] summary::after {
+    content: '−';
+}
+
+.item p,
+.item small {
+    display: block;
+    margin: 0 0 var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.55;
+}
+
+.item small {
+    font-size: 0.74rem;
+}

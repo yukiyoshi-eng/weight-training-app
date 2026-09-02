@@ -4,16 +4,22 @@ import { clsx } from 'clsx';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
+    help?: React.ReactNode;
     error?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, label, error, id, ...props }, ref) => {
+    ({ className, label, help, error, id, ...props }, ref) => {
         const generatedId = React.useId();
         const inputId = id ?? generatedId;
         return (
             <div className={styles.container}>
-                {label && <label className={styles.label} htmlFor={inputId}>{label}</label>}
+                {label && (
+                    <div className={styles.labelRow}>
+                        <label className={styles.label} htmlFor={inputId}>{label}</label>
+                        {help}
+                    </div>
+                )}
                 <input
                     ref={ref}
                     id={inputId}

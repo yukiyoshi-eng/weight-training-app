@@ -14,9 +14,15 @@
     color: var(--primary);
 }
 
-.card span {
-    display: block;
-    margin: var(--spacing-sm) 0 3px;
+.labelRow {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-top: var(--spacing-xs);
+}
+
+.card .label {
     color: var(--text-secondary);
     font-size: 0.75rem;
 }

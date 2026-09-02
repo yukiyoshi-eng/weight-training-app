@@ -1,5 +1,6 @@
 import { DataExport } from '@/components/features/DataExport';
 import { ResetDatabase } from '@/components/features/ResetDatabase';
+import { GlossaryCard } from '@/components/features/GlossaryCard';
 import { Card } from '@/components/ui/Card';
 
 export default function SettingsPage() {
@@ -19,11 +20,12 @@ export default function SettingsPage() {
                 </div>
             </Card>
 
+            <GlossaryCard />
             <DataExport />
             <ResetDatabase />
 
             <div style={{ textAlign: 'center', marginTop: '2rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                LiftLog v1.1.0 · データはこの端末に保存されます
+                LiftLog v1.2.0 · データはこの端末に保存されます
             </div>
         </main>
     );

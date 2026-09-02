@@ -11,7 +11,7 @@ export const ResetDatabase = () => {
     const [isResetting, setIsResetting] = useState(false);
 
     const handleReset = async () => {
-        if (!confirm('本当にデータベースをリセットしますか？\nすべての記録が削除され、初期状態に戻ります。この操作は取り消せません。')) {
+        if (!confirm('アプリの全データを削除して初期状態に戻しますか？\nこの操作は取り消せません。')) {
             return;
         }
 
@@ -31,8 +31,8 @@ export const ResetDatabase = () => {
             <h3 className={styles.title}>危険な操作</h3>
             <div className={styles.content}>
                 <p className={styles.description}>
-                    データベースを削除し、アプリを初期状態に戻します。
-                    英語の種目データを日本語の初期データに置き換えたい場合などに使用してください。
+                    この端末に保存したトレーニング記録、カスタム種目、設定をすべて削除します。
+                    必要な記録は、先にバックアップを書き出してください。
                 </p>
                 <Button
                     onClick={handleReset}
@@ -41,7 +41,7 @@ export const ResetDatabase = () => {
                     className={styles.button}
                 >
                     <Trash2 size={16} style={{ marginRight: 8 }} />
-                    データベースをリセット
+                    すべてのデータを削除
                 </Button>
             </div>
         </Card>
