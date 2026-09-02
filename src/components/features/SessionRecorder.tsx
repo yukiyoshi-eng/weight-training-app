@@ -1,85 +1,130 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { db, Exercise, TrainingSession, TrainingSet } from '@/lib/db';
+import React, { useEffect, useMemo, useState } from 'react';
+import { db, deleteSession } from '@/lib/db';
+import { toLocalDateKey } from '@/lib/date';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Plus, Save, Trash2, Clock } from 'lucide-react';
+import { ChevronRight, Plus, Search, Trash2 } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import styles from './SessionRecorder.module.css';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SetRecorder } from './SetRecorder';
-import { Search, ChevronRight } from 'lucide-react';
 
 export const SessionRecorder = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const requestedSessionId = Number(searchParams.get('sessionId')) || null;
     const [sessionId, setSessionId] = useState<number | null>(null);
     const [activeExerciseId, setActiveExerciseId] = useState<number | null>(null);
-    const [sets, setSets] = useState<TrainingSet[]>([]);
     const [memo, setMemo] = useState('');
+    const [sessionDate, setSessionDate] = useState(toLocalDateKey());
+    const [wasCompleted, setWasCompleted] = useState(false);
+    const [originalEndTime, setOriginalEndTime] = useState<string | undefined>();
+    const [isReady, setIsReady] = useState(false);
+    const [search, setSearch] = useState('');
+    const [error, setError] = useState('');
 
-    // Load exercises for selection
-    const exercises = useLiveQuery(() => db.exercises.toArray());
-
-    // Load exercises that have sets in this session
+    const exercises = useLiveQuery(() => db.exercises.filter((exercise) => !exercise.isDeleted).toArray());
     const sessionSets = useLiveQuery(
-        () => db.sets.where('sessionId').equals(sessionId || -1).toArray()
-        , [sessionId]);
-
+        () => db.sets.where('sessionId').equals(sessionId ?? -1).toArray(),
+        [sessionId],
+    );
     const activeExercises = useLiveQuery(async () => {
-        if (!sessionSets || sessionSets.length === 0) return [];
-        const exerciseIds = Array.from(new Set(sessionSets.map(s => s.exerciseId)));
+        if (!sessionSets?.length) return [];
+        const exerciseIds = Array.from(new Set(sessionSets.map((set) => set.exerciseId)));
         return db.exercises.where('id').anyOf(exerciseIds).toArray();
     }, [sessionSets]);
 
-    // Initialize session on mount
     useEffect(() => {
-        const initSession = async () => {
-            // Check if there's an active session (simplified for now: just create new or use existing logic later)
-            // For now, we'll just start a "draft" state in memory
+        let cancelled = false;
+        const loadSession = async () => {
+            const requested = requestedSessionId ? await db.sessions.get(requestedSessionId) : undefined;
+            const draft = requested
+                ? undefined
+                : await db.sessions.filter((session) => !session.endTime).last();
+            const session = requested ?? draft;
+
+            if (!cancelled && session?.id) {
+                setSessionId(session.id);
+                setMemo(session.memo ?? '');
+                setSessionDate(session.date);
+                setWasCompleted(Boolean(session.endTime));
+                setOriginalEndTime(session.endTime);
+            }
+            if (!cancelled) setIsReady(true);
         };
-        initSession();
-    }, []);
+        loadSession();
+        return () => {
+            cancelled = true;
+        };
+    }, [requestedSessionId]);
+
+    const availableExercises = useMemo(() => {
+        const list = exercises ?? [];
+        return [...list]
+            .filter((exercise) => exercise.name.toLowerCase().includes(search.toLowerCase()))
+            .sort((a, b) => Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)) || a.name.localeCompare(b.name, 'ja'));
+    }, [exercises, search]);
 
     const handleStartSession = async () => {
+        const now = new Date().toISOString();
         const id = await db.sessions.add({
-            date: new Date().toISOString().split('T')[0],
-            startTime: new Date().toISOString(),
+            date: sessionDate,
+            startTime: now,
+            updatedAt: now,
         });
         setSessionId(id as number);
+        setWasCompleted(false);
     };
 
-    const handleAddSet = async (exerciseId: number, weight: number, reps: number, rpe?: number) => {
+    const persistSessionDetails = async (updates: { date?: string; memo?: string }) => {
         if (!sessionId) return;
-
-        const newSet: TrainingSet = {
-            sessionId,
-            exerciseId,
-            weight,
-            reps,
-            rpe,
-            order: sets.filter(s => s.exerciseId === exerciseId).length + 1
-        };
-
-        const id = await db.sets.add(newSet);
-        setSets([...sets, { ...newSet, id: id as number }]);
+        await db.sessions.update(sessionId, { ...updates, updatedAt: new Date().toISOString() });
     };
 
     const handleFinishSession = async () => {
         if (!sessionId) return;
+        if (!sessionSets?.length) {
+            setError('少なくとも1セット記録してください。');
+            return;
+        }
         await db.sessions.update(sessionId, {
-            endTime: new Date().toISOString(),
-            memo
+            date: sessionDate,
+            endTime: originalEndTime ?? new Date().toISOString(),
+            memo: memo.trim(),
+            updatedAt: new Date().toISOString(),
         });
         router.push('/history');
     };
 
-    // Simplified UI for now
+    const handleDeleteSession = async () => {
+        if (!sessionId || !confirm(wasCompleted ? 'このトレーニング記録を削除しますか？' : '入力中のセッションを破棄しますか？')) return;
+        await deleteSession(sessionId);
+        setSessionId(null);
+        setActiveExerciseId(null);
+        setMemo('');
+        setSessionDate(toLocalDateKey());
+        if (wasCompleted) router.push('/history');
+    };
+
+    if (!isReady) return <div className={styles.loading}>記録を読み込んでいます...</div>;
+
     if (!sessionId) {
         return (
             <div className={styles.startContainer}>
-                <Button size="lg" onClick={handleStartSession}>トレーニング開始</Button>
+                <div className={styles.startPanel}>
+                    <h1>今日のトレーニング</h1>
+                    <p>記録はこの端末に自動保存されます。</p>
+                    <Input
+                        type="date"
+                        label="トレーニング日"
+                        value={sessionDate}
+                        onChange={(event) => setSessionDate(event.target.value)}
+                    />
+                    <Button size="lg" onClick={handleStartSession}>トレーニング開始</Button>
+                </div>
             </div>
         );
     }
@@ -99,47 +144,80 @@ export const SessionRecorder = () => {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h2>現在のセッション</h2>
-                <Button variant="ghost" size="sm" onClick={handleFinishSession}>終了</Button>
+                <div>
+                    <span className={styles.eyebrow}>{wasCompleted ? 'EDIT WORKOUT' : 'ACTIVE WORKOUT'}</span>
+                    <h2>{wasCompleted ? '記録を編集' : '現在のセッション'}</h2>
+                </div>
+                <Button size="sm" onClick={handleFinishSession}>{wasCompleted ? '保存' : '終了'}</Button>
             </div>
 
-            <div className={styles.sessionInfo}>
+            <Card className={styles.sessionInfo}>
                 <Input
-                    placeholder="セッションメモ"
-                    value={memo}
-                    onChange={e => setMemo(e.target.value)}
+                    type="date"
+                    label="トレーニング日"
+                    value={sessionDate}
+                    onChange={(event) => {
+                        setSessionDate(event.target.value);
+                        persistSessionDetails({ date: event.target.value });
+                    }}
                 />
-            </div>
+                <Input
+                    label="セッションメモ"
+                    placeholder="調子やフォームのメモ"
+                    value={memo}
+                    onChange={(event) => setMemo(event.target.value)}
+                    onBlur={() => persistSessionDetails({ memo: memo.trim() })}
+                />
+            </Card>
+
+            {error && <p className={styles.error} role="alert">{error}</p>}
 
             <div className={styles.exerciseList}>
-                <h3>種目</h3>
-                {activeExercises?.map(ex => (
-                    <Card
-                        key={ex.id}
+                <h3>記録中の種目</h3>
+                {activeExercises?.map((exercise) => (
+                    <button
+                        type="button"
+                        key={exercise.id}
                         className={styles.exerciseItem}
-                        onClick={() => setActiveExerciseId(ex.id!)}
+                        onClick={() => setActiveExerciseId(exercise.id!)}
                     >
-                        <span>{ex.name}</span>
-                        <ChevronRight size={20} color="var(--text-secondary)" />
-                    </Card>
+                        <span>{exercise.name}</span>
+                        <ChevronRight size={20} aria-hidden="true" />
+                    </button>
                 ))}
+                {!activeExercises?.length && <p className={styles.empty}>下の一覧から種目を選んでください。</p>}
 
                 <div className={styles.addExercise}>
                     <h4>種目を追加</h4>
+                    <div className={styles.searchBox}>
+                        <Search size={18} aria-hidden="true" />
+                        <input
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            placeholder="種目を検索"
+                            aria-label="追加する種目を検索"
+                        />
+                    </div>
                     <div className={styles.searchList}>
-                        {exercises?.map(ex => (
+                        {availableExercises.map((exercise) => (
                             <button
-                                key={ex.id}
+                                key={exercise.id}
                                 className={styles.searchItem}
-                                onClick={() => setActiveExerciseId(ex.id!)}
+                                onClick={() => setActiveExerciseId(exercise.id!)}
                             >
-                                <Plus size={16} />
-                                {ex.name}
+                                <Plus size={16} aria-hidden="true" />
+                                <span>{exercise.name}</span>
+                                {exercise.favorite && <span className={styles.favorite}>★</span>}
                             </button>
                         ))}
                     </div>
                 </div>
             </div>
+
+            <Button variant="ghost" className={styles.deleteSession} onClick={handleDeleteSession}>
+                <Trash2 size={16} aria-hidden="true" />
+                {wasCompleted ? 'この記録を削除' : 'セッションを破棄'}
+            </Button>
         </div>
     );
 };

@@ -27,6 +27,7 @@ export const BottomNav = () => {
                         key={href}
                         href={href}
                         className={clsx(styles.item, isActive && styles.active)}
+                        aria-current={isActive ? 'page' : undefined}
                     >
                         <Icon size={24} className={styles.icon} />
                         <span className={styles.label}>{label}</span>

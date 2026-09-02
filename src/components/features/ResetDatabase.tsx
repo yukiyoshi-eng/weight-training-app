@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { db } from '@/lib/db';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Trash2, AlertTriangle } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import styles from './ResetDatabase.module.css';
 
 export const ResetDatabase = () => {

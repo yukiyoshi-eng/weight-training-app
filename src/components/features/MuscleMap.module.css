@@ -5,7 +5,36 @@
 .title {
     font-size: 1rem;
     font-weight: 600;
+    margin-bottom: 0;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
     margin-bottom: var(--spacing-md);
+}
+
+.viewSwitch {
+    display: flex;
+    gap: 3px;
+}
+
+.viewSwitch button {
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.viewSwitch button.active {
+    border-color: var(--primary);
+    background: rgba(0, 240, 255, 0.12);
+    color: var(--primary);
 }
 
 .mapWrapper {
@@ -50,4 +79,9 @@
 .legendValue {
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.empty {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
 }

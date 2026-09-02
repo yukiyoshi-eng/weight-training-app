@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import { HistoryCalendar } from '@/components/features/HistoryCalendar';
 import { SessionList } from '@/components/features/SessionList';
+import { toLocalDateKey } from '@/lib/date';
 
 export default function HistoryPage() {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(toLocalDateKey());
 
     return (
         <main style={{ padding: '1rem' }}>

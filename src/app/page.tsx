@@ -7,26 +7,27 @@ import { useRouter } from 'next/navigation';
 import { Play, TrendingUp, Calendar } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
+import { dateKeyDaysAgo } from '@/lib/date';
 import styles from './page.module.css';
 
 export default function Home() {
   const router = useRouter();
 
   const recentSessions = useLiveQuery(
-    () => db.sessions.orderBy('date').reverse().limit(3).toArray()
+    () => db.sessions.filter((session) => Boolean(session.endTime)).reverse().limit(3).toArray()
   );
 
   const weeklyCount = useLiveQuery(async () => {
-    const now = new Date();
-    const oneWeekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7).toISOString().split('T')[0];
-    return db.sessions.where('date').aboveOrEqual(oneWeekAgo).count();
+    const oneWeekAgo = dateKeyDaysAgo(6);
+    return db.sessions.where('date').aboveOrEqual(oneWeekAgo).filter((session) => Boolean(session.endTime)).count();
   });
 
   return (
     <main className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>おかえりなさい</h1>
-        <p className={styles.subtitle}>今日もトレーニングを頑張りましょう！</p>
+        <span className={styles.eyebrow}>LOCAL-FIRST TRAINING LOG</span>
+        <h1 className={styles.title}>LiftLog</h1>
+        <p className={styles.subtitle}>今日の一歩を、次の成長につなげよう。</p>
       </header>
 
       <section className={styles.actionSection}>

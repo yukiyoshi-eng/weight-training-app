@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LiftLog
 
-## Getting Started
+スマートフォンで素早くトレーニングを記録し、履歴・負荷・最高重量・筋肉部位の偏りを確認できるローカルファーストPWAです。
 
-First, run the development server:
+**公開デモ:** https://yukiyoshi-eng.github.io/weight-training-app/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 主な機能
+
+- 重量・回数・RPE・時間のセット記録
+- 入力途中セッションの自動復元
+- 前回セットの参照・一括コピー
+- 過去セッションとセットの編集・削除
+- カレンダー形式の履歴
+- 30日・90日・全期間の分析
+- 総負荷、最高重量、セッション数、ストリーク
+- 正面・背面の筋肉分布
+- カスタム種目、お気に入り、検索
+- JSONバックアップの出力・復元
+- PWAインストールとオフライン利用
+
+## 設計
+
+```mermaid
+flowchart LR
+    UI[Next.js / React UI] --> Hooks[Dexie live queries]
+    Hooks --> DB[(IndexedDB)]
+    DB --> History[履歴・編集]
+    DB --> Analytics[集計・グラフ]
+    SW[Service Worker] --> Cache[(App shell cache)]
+    Cache --> UI
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+トレーニングデータは外部サーバーへ送信せず、利用端末のIndexedDBに保存します。Service Workerが画面と静的アセットをキャッシュするため、一度読み込んだ後は通信できない環境でも記録・閲覧できます。バックアップファイルを使って手動で移行できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 技術スタック
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js 16 / React 19 / TypeScript
+- Dexie.js / IndexedDB
+- Recharts
+- Vitest / ESLint
+- GitHub Actions / GitHub Pages
+- Web App Manifest / Service Worker
 
-## Learn More
+## ローカル実行
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm ci
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`http://localhost:3000` を開きます。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 品質チェック
 
-## Deploy on Vercel
+```bash
+npm run lint
+npm test
+npm run build
+npm audit
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+分析ロジックは、種目別負荷、期間抽出、ストリーク、サマリー集計を自動テストしています。`master`へのpush時には、GitHub ActionsがLint・テスト・静的ビルドを実行し、成功した成果物だけをGitHub Pagesへ公開します。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## プライバシー
+
+- アカウント登録なし
+- 外部APIへの記録送信なし
+- 位置情報・ヘルスケアデータへのアクセスなし
+- データ削除は端末内だけで完結
+
+端末やブラウザのデータを削除すると記録も消えるため、必要に応じて設定画面からバックアップを保存してください。

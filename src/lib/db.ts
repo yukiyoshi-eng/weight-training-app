@@ -10,6 +10,7 @@ export interface Exercise {
     type: ExerciseType;
     custom: boolean; // true if added by user
     isDeleted?: boolean; // Soft delete
+    favorite?: boolean;
 }
 
 export interface TrainingSession {
@@ -18,6 +19,7 @@ export interface TrainingSession {
     startTime?: string;
     endTime?: string;
     memo?: string;
+    updatedAt?: string;
 }
 
 export interface TrainingSet {
@@ -53,10 +55,24 @@ export class WeightTrainingDatabase extends Dexie {
             sets: '++id, sessionId, exerciseId, [sessionId+exerciseId]',
             goals: '++id, exerciseId, deadline'
         });
+
+        this.version(2).stores({
+            exercises: '++id, name, *targetMuscles, type, custom, isDeleted, favorite',
+            sessions: '++id, date, endTime, updatedAt',
+            sets: '++id, sessionId, exerciseId, [sessionId+exerciseId]',
+            goals: '++id, exerciseId, deadline'
+        });
     }
 }
 
 export const db = new WeightTrainingDatabase();
+
+export const deleteSession = async (sessionId: number) => {
+    await db.transaction('rw', db.sessions, db.sets, async () => {
+        await db.sets.where('sessionId').equals(sessionId).delete();
+        await db.sessions.delete(sessionId);
+    });
+};
 
 // Initial seed data
 db.on('populate', () => {

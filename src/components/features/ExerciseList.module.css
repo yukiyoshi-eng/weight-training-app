@@ -46,6 +46,36 @@
     transition: transform 0.1s ease;
 }
 
+.favoriteButton,
+.itemActions button {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.favoriteButton {
+    color: var(--secondary);
+    margin-right: var(--spacing-xs);
+}
+
+.itemActions {
+    display: flex;
+    gap: 2px;
+}
+
+.itemActions button:hover,
+.favoriteButton:hover {
+    background: var(--surface-hover);
+    color: var(--primary);
+}
+
 .item:active {
     transform: scale(0.98);
 }

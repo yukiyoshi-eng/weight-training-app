@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { db } from '@/lib/db';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -9,6 +9,8 @@ import styles from './DataExport.module.css';
 
 export const DataExport = () => {
     const [isExporting, setIsExporting] = useState(false);
+    const [message, setMessage] = useState('');
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleExport = async () => {
         setIsExporting(true);
@@ -44,6 +46,30 @@ export const DataExport = () => {
         }
     };
 
+    const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+            const data = JSON.parse(await file.text());
+            if (data.version !== 1 || !Array.isArray(data.exercises) || !Array.isArray(data.sessions) || !Array.isArray(data.sets)) {
+                throw new Error('Invalid backup');
+            }
+            if (!confirm('現在のデータをバックアップ内容で置き換えますか？')) return;
+            await db.transaction('rw', db.exercises, db.sessions, db.sets, db.goals, async () => {
+                await Promise.all([db.exercises.clear(), db.sessions.clear(), db.sets.clear(), db.goals.clear()]);
+                await db.exercises.bulkPut(data.exercises);
+                await db.sessions.bulkPut(data.sessions);
+                await db.sets.bulkPut(data.sets);
+                if (Array.isArray(data.goals)) await db.goals.bulkPut(data.goals);
+            });
+            setMessage('バックアップを復元しました。');
+        } catch {
+            setMessage('このファイルは復元できません。');
+        } finally {
+            event.target.value = '';
+        }
+    };
+
     return (
         <Card className={styles.container}>
             <h3 className={styles.title}>データ管理</h3>
@@ -52,8 +78,20 @@ export const DataExport = () => {
                     <Download size={16} style={{ marginRight: 8 }} />
                     データのエクスポート (JSON)
                 </Button>
-                {/* Import functionality could be added here */}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/json,.json"
+                    onChange={handleImport}
+                    className={styles.fileInput}
+                    aria-label="バックアップファイルを選択"
+                />
+                <Button onClick={() => fileInputRef.current?.click()} variant="secondary" className={styles.button}>
+                    <Upload size={16} style={{ marginRight: 8 }} />
+                    バックアップを復元
+                </Button>
             </div>
+            {message && <p className={styles.message} role="status">{message}</p>}
         </Card>
     );
 };

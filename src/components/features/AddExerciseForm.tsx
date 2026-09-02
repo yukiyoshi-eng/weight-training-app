@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { db, ExerciseType, MuscleTarget } from '@/lib/db';
+import { db } from '@/lib/db';
+import type { Exercise, ExerciseType, MuscleTarget } from '@/lib/db';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
@@ -9,69 +10,116 @@ import styles from './AddExerciseForm.module.css';
 
 const MUSCLE_TARGETS: MuscleTarget[] = ['chest', 'back', 'shoulders', 'arms', 'legs', 'core', 'other'];
 
-export const AddExerciseForm = ({ onCancel, onSuccess }: { onCancel: () => void, onSuccess: () => void }) => {
-    const [name, setName] = useState('');
-    const [selectedMuscles, setSelectedMuscles] = useState<MuscleTarget[]>([]);
-    const [type, setType] = useState<ExerciseType>('weight_reps');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+export const MUSCLE_LABELS: Record<MuscleTarget, string> = {
+    chest: '胸',
+    back: '背中',
+    shoulders: '肩',
+    arms: '腕',
+    legs: '脚',
+    core: '体幹',
+    other: 'その他',
+};
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!name.trim()) return;
+const TYPE_LABELS: Record<ExerciseType, string> = {
+    weight_reps: '重量 × 回数',
+    bodyweight_reps: '自重 × 回数',
+    duration: '時間',
+};
+
+type AddExerciseFormProps = {
+    exercise?: Exercise;
+    onCancel: () => void;
+    onSuccess: () => void;
+};
+
+export const AddExerciseForm = ({ exercise, onCancel, onSuccess }: AddExerciseFormProps) => {
+    const [name, setName] = useState(exercise?.name ?? '');
+    const [selectedMuscles, setSelectedMuscles] = useState<MuscleTarget[]>(exercise?.targetMuscles ?? []);
+    const [type, setType] = useState<ExerciseType>(exercise?.type ?? 'weight_reps');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!name.trim() || selectedMuscles.length === 0) {
+            setError('種目名とターゲット部位を入力してください。');
+            return;
+        }
 
         setIsSubmitting(true);
+        setError('');
         try {
-            await db.exercises.add({
-                name,
+            const values = {
+                name: name.trim(),
                 targetMuscles: selectedMuscles,
                 type,
-                custom: true,
-            });
-            setName('');
-            setSelectedMuscles([]);
+                custom: exercise?.custom ?? true,
+            };
+            if (exercise?.id) {
+                await db.exercises.update(exercise.id, values);
+            } else {
+                await db.exercises.add(values);
+            }
             onSuccess();
-        } catch (error) {
-            console.error('Failed to add exercise:', error);
+        } catch {
+            setError('種目を保存できませんでした。');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const toggleMuscle = (muscle: MuscleTarget) => {
-        setSelectedMuscles(prev =>
-            prev.includes(muscle)
-                ? prev.filter(m => m !== muscle)
-                : [...prev, muscle]
+        setSelectedMuscles((current) =>
+            current.includes(muscle)
+                ? current.filter((item) => item !== muscle)
+                : [...current, muscle],
         );
     };
 
     return (
         <Card className={styles.container}>
-            <h3 className={styles.title}>新規種目の追加</h3>
+            <h3 className={styles.title}>{exercise ? '種目を編集' : '新規種目の追加'}</h3>
             <form onSubmit={handleSubmit} className={styles.form}>
                 <Input
                     label="種目名"
                     value={name}
-                    onChange={e => setName(e.target.value)}
+                    onChange={(event) => setName(event.target.value)}
                     placeholder="例：ベンチプレス"
                     required
                 />
 
                 <div className={styles.field}>
-                    <label className={styles.label}>ターゲット部位</label>
+                    <label className={styles.label} htmlFor="exercise-type">記録方法</label>
+                    <select
+                        id="exercise-type"
+                        className={styles.select}
+                        value={type}
+                        onChange={(event) => setType(event.target.value as ExerciseType)}
+                    >
+                        {Object.entries(TYPE_LABELS).map(([value, label]) => (
+                            <option key={value} value={value}>{label}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <fieldset className={styles.fieldset}>
+                    <legend className={styles.label}>ターゲット部位</legend>
                     <div className={styles.muscleGrid}>
-                        {MUSCLE_TARGETS.map(muscle => (
+                        {MUSCLE_TARGETS.map((muscle) => (
                             <button
                                 key={muscle}
                                 type="button"
                                 className={`${styles.muscleChip} ${selectedMuscles.includes(muscle) ? styles.selected : ''}`}
                                 onClick={() => toggleMuscle(muscle)}
+                                aria-pressed={selectedMuscles.includes(muscle)}
                             >
-                                {muscle}
+                                {MUSCLE_LABELS[muscle]}
                             </button>
                         ))}
                     </div>
-                </div>
+                </fieldset>
+
+                {error && <p className={styles.error} role="alert">{error}</p>}
 
                 <div className={styles.actions}>
                     <Button type="button" variant="ghost" onClick={onCancel}>キャンセル</Button>

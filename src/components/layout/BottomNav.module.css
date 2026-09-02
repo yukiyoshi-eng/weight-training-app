@@ -1,8 +1,9 @@
 .nav {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    width: min(100%, 760px);
+    transform: translateX(-50%);
     height: 60px;
     background-color: var(--surface);
     border-top: 1px solid var(--border);

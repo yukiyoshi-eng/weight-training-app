@@ -64,6 +64,7 @@ export const HistoryCalendar = ({ onSelectDate, selectedDate }: HistoryCalendarP
                         isSelected && styles.selected
                     )}
                     onClick={() => handleDateClick(i)}
+                    aria-label={`${dateStr}${hasTraining ? ' トレーニングあり' : ''}`}
                 >
                     {i}
                     {hasTraining && <div className={styles.dot} />}
@@ -76,13 +77,13 @@ export const HistoryCalendar = ({ onSelectDate, selectedDate }: HistoryCalendarP
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
+                <Button variant="ghost" size="icon" onClick={handlePrevMonth} aria-label="前の月">
                     <ChevronLeft size={20} />
                 </Button>
                 <h3 className={styles.monthTitle}>
                     {currentMonth.toLocaleString('ja-JP', { month: 'long', year: 'numeric' })}
                 </h3>
-                <Button variant="ghost" size="icon" onClick={handleNextMonth}>
+                <Button variant="ghost" size="icon" onClick={handleNextMonth} aria-label="次の月">
                     <ChevronRight size={20} />
                 </Button>
             </div>
